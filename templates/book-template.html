@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="{{book.language}}" dir="{{book.direction}}">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{book.title}}</title>
+    <style>
+        {{{styles}}}
+        .ql-align-right { text-align: right !important; }
+        .ql-align-center { text-align: center !important; }
+        .ql-align-justify { text-align: justify !important; }
+        .ql-direction-rtl { direction: rtl; }
+        
+        /* Styles d'alignement Quill avec spécificité renforcée */
+        .page-content .ql-align-right,
+        .page .ql-align-right,
+        p.ql-align-right,
+        div.ql-align-right { text-align: right !important; }
+        
+        .page-content .ql-align-center,
+        .page .ql-align-center,
+        p.ql-align-center,
+        div.ql-align-center { text-align: center !important; }
+        
+        .page-content .ql-align-justify,
+        .page .ql-align-justify,
+        p.ql-align-justify,
+        div.ql-align-justify { text-align: justify !important; }
+    </style>
+</head>
+<body class="{{book.direction}}">
+    {{{body}}}
+    <script>{{{scripts}}}</script>
+</body>
+</html>

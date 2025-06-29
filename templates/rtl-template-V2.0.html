@@ -1,0 +1,586 @@
+<!DOCTYPE html>
+<html lang="{{book.language}}" dir="{{book.direction}}">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{book.title}}</title>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400;1,500;1,600&display=swap" rel="stylesheet">
+    
+    <style>
+        {{{styles}}}
+        
+        /* ===== STPAGEFLIP FROM SCRATCH RTL STYLES ===== */
+        body {
+            font-family: var(--font-primary);
+            background: linear-gradient(135deg, var(--tertiary-color) 0%, #e8eff2 100%);
+            margin: 0;
+            padding: 20px;
+            color: var(--primary-color);
+        }
+
+        .book-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            flex-direction: column;
+        }
+
+        .flip-book {
+            box-shadow: 0 0 20px 0 rgba(50, 62, 72, 0.4);
+        }
+
+        /* ===== RTL FLIP BOOK POSITIONING ===== */
+        [dir="rtl"] .flip-book {
+            transform: scaleX(-1); /* Miroir horizontal pour RTL */
+        }
+
+        /* Appliquer scaleX seulement sur le contenu, pas sur la page entière */
+        [dir="rtl"] .page-content {
+            transform: scaleX(-1); /* Contre-miroir pour remettre le contenu à l'endroit */
+        }
+
+        .page {
+            padding: 40px;
+            background-color: white;
+            color: var(--primary-color);
+            border: 1px solid var(--tertiary-dark);
+            overflow: hidden;
+            box-sizing: border-box;
+        }
+
+        .page-content {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            font-size: calc(1rem * var(--text-zoom, 1));
+        }
+
+        /* ===== NAVIGATION ===== */
+        .controls {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 1000;
+            display: flex;
+            gap: 15px;
+            background: rgba(255,255,255,0.95);
+            padding: 15px 25px;
+            border-radius: 25px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+        }
+
+        .control-button {
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            font-family: var(--font-primary);
+        }
+
+        .control-button:hover {
+            background: var(--primary-light);
+            transform: translateY(-2px);
+        }
+
+        .control-button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .home-button {
+            background: var(--secondary-color) !important;
+            font-size: 16px;
+        }
+
+        .home-button:hover {
+            background: var(--secondary-light) !important;
+        }
+
+
+        /* ===== PROGRESS ===== */
+        .progress-container {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: rgba(255,255,255,0.95);
+            padding: 15px 20px;
+            border-radius: 20px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+            z-index: 1000;
+            font-family: var(--font-primary);
+        }
+
+        [dir="rtl"] .progress-container {
+            right: auto;
+            left: 20px;
+        }
+
+        .progress-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 8px;
+        }
+
+        .progress-text {
+            font-size: 14px;
+            color: var(--primary-color);
+            text-align: center;
+            flex-grow: 1;
+        }
+
+        .progress-bar {
+            width: 120px;
+            height: 4px;
+            background: var(--tertiary-color);
+            border-radius: 2px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: var(--secondary-color);
+            width: 0%;
+            transition: width 0.5s ease;
+        }
+
+        .zoom-btn {
+            background: var(--tertiary-color);
+            border: none;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--primary-color);
+        }
+
+        .zoom-btn:hover {
+            background: var(--tertiary-dark);
+            transform: scale(1.1);
+        }
+
+        /* ===== LOADING ===== */
+        .loading {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+            text-align: center;
+            z-index: 1000;
+        }
+
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid var(--tertiary-color);
+            border-top: 4px solid var(--secondary-color);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 15px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* ===== TYPOGRAPHIE ===== */
+        .page h1 {
+            color: var(--primary-color);
+            font-size: 1.8rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            text-align: center;
+            border-bottom: 2px solid var(--secondary-color);
+            padding-bottom: 0.8rem;
+        }
+
+        .page h2 {
+            color: var(--primary-color);
+            font-size: 1.4rem;
+            font-weight: 600;
+            margin: 1rem 0 0.8rem 0;
+            border-left: 3px solid var(--secondary-color);
+            padding-left: 1rem;
+        }
+
+        .page p {
+            margin-bottom: 0.6rem;
+            text-align: justify;
+            line-height: 1.4;
+            font-size: 0.95rem;
+        }
+
+        /* ===== RTL SUPPORT ===== */
+        [dir="rtl"] .page h2 {
+            border-left: none;
+            border-right: 3px solid var(--secondary-color);
+            padding-left: 0;
+            padding-right: 1rem;
+        }
+
+        [dir="rtl"] .page p {
+            text-align: right;
+        }
+
+        /* ===== QUILL STYLES ===== */
+        .ql-size-small { font-size: 0.75em; }
+        .ql-size-large { font-size: 1.5em; }
+        .ql-size-huge  { font-size: 2.5em; }
+        .ql-align-right { text-align: right !important; }
+        .ql-align-center { text-align: center !important; }
+        .ql-align-justify { text-align: justify !important; }
+        .ql-direction-rtl { direction: rtl; }
+
+        /* ===== PAGE COVERS ===== */
+        .page-cover {
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-light));
+            color: white;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .page-cover h1 {
+            color: inherit;
+            border-bottom-color: var(--secondary-color);
+            font-size: 2.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .page-cover h2,
+        .page-cover h3 {
+            color: inherit;
+        }
+
+    </style>
+</head>
+<body>
+    <!-- Loading -->
+    <div class="loading" id="loading">
+        <div class="spinner"></div>
+        <div style="color: var(--primary-color); font-weight: 600;">Chargement du livre digital...</div>
+    </div>
+
+
+    <!-- Progress -->
+    <div class="progress-container" id="progressContainer" style="display: none;">
+        <div class="progress-header">
+            <button class="zoom-btn" onclick="zoomOut()" id="zoomOutBtn">-</button>
+            <div class="progress-text" id="progressText">Page 1 / {{pages.length}}</div>
+            <button class="zoom-btn" onclick="zoomIn()" id="zoomInBtn">+</button>
+        </div>
+        <div class="progress-bar">
+            <div class="progress-fill" id="progressFill"></div>
+        </div>
+    </div>
+
+    <!-- Book Container -->
+    <div class="book-container">
+        <div class="flip-book" id="book">
+            {{{body}}}
+        </div>
+    </div>
+
+    <!-- Controls -->
+    <div class="controls" id="controls" style="display: none;">
+        <button class="control-button" onclick="turnLeft()" id="leftBtn">&lt;</button>
+        <button class="control-button home-button" onclick="goToHome()" id="homeBtn">⌂</button>
+        <button class="control-button" onclick="turnRight()" id="rightBtn">&gt;</button>
+    </div>
+
+    <!-- StPageFlip ORIGINAL CDN -->
+    <script src="https://unpkg.com/page-flip@2.0.7/dist/js/page-flip.browser.js"></script>
+    
+    <script>
+        let pageFlip;
+        let totalPages = 0;
+        let isRTL = document.documentElement.dir === 'rtl';
+        let originalEventHandlers = new Map();
+
+        console.log('🚀 RTL From Scratch - Direction:', isRTL ? 'RTL' : 'LTR');
+
+        // ===== INTERCEPTION ÉVÉNEMENTS SURVOL RTL =====
+        function setupRTLEventInterception() {
+            if (!isRTL) {
+                console.log('📘 Mode LTR - Pas d\'interception nécessaire');
+                return;
+            }
+
+            console.log('🔧 RTL - Configuration interception des événements de survol');
+            
+            const bookElement = document.getElementById('book');
+            if (!bookElement) return;
+
+            // Intercepter les événements de survol et mouvement
+            const eventsToIntercept = [
+                'mousemove', 'mouseenter', 'mouseleave'
+            ];
+
+            eventsToIntercept.forEach(eventType => {
+                const originalHandler = function(event) {
+                    // Stocker l'événement original temporairement
+                    const originalX = event.clientX;
+                    const rect = bookElement.getBoundingClientRect();
+                    const bookLeft = rect.left;
+                    const bookRight = rect.right;
+                    
+                    // Calculer la nouvelle position X inversée
+                    const newX = bookRight - (originalX - bookLeft);
+                    
+                    // Modifier directement les propriétés de l'événement
+                    Object.defineProperty(event, 'clientX', {
+                        value: newX,
+                        writable: true
+                    });
+                    Object.defineProperty(event, 'pageX', {
+                        value: event.pageX - (originalX - newX),
+                        writable: true
+                    });
+                    
+                    console.log(`🔄 RTL Survol: ${originalX} → ${newX}`);
+                };
+                
+                bookElement.addEventListener(eventType, originalHandler, true);
+                originalEventHandlers.set(eventType, originalHandler);
+            });
+
+            console.log('✅ RTL - Interception des événements de survol activée');
+        }
+
+        function createRTLModifiedHoverEvent(originalEvent) {
+            const bookElement = document.getElementById('book');
+            const rect = bookElement.getBoundingClientRect();
+            
+            // Calculer les coordonnées inversées pour le survol
+            const originalX = originalEvent.clientX;
+            const bookLeft = rect.left;
+            const bookRight = rect.right;
+            
+            // Inversion horizontale pour corriger le survol RTL
+            const newX = bookRight - (originalX - bookLeft);
+
+            // Créer un nouvel événement avec les coordonnées corrigées
+            const newEvent = new MouseEvent(originalEvent.type, {
+                bubbles: originalEvent.bubbles,
+                cancelable: originalEvent.cancelable,
+                clientX: newX,
+                clientY: originalEvent.clientY,
+                button: originalEvent.button,
+                buttons: originalEvent.buttons,
+                detail: originalEvent.detail,
+                view: originalEvent.view,
+                pageX: originalEvent.pageX - (originalX - newX),
+                screenX: originalEvent.screenX - (originalX - newX)
+            });
+
+            return newEvent;
+        }
+
+        // ===== INITIALISATION STPAGEFLIP =====
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('🚀 Initialisation StPageFlip Original + Interception RTL');
+            
+            // Configuration StPageFlip - Mode "livre fermé" avec showCover
+            pageFlip = new St.PageFlip(document.getElementById('book'), {
+                width: 550,
+                height: 733,
+                size: 'stretch',
+                minWidth: 280,
+                maxWidth: 900,
+                minHeight: 420,
+                maxHeight: 1350,
+                maxShadowOpacity: 0.7,
+                showCover: true,   // COVER affichée seule comme un livre fermé
+                mobileScrollSupport: false,
+                flippingTime: 1000,
+                usePortrait: true,  // Mode portrait pour single page
+                startPage: 0,
+                drawShadow: true,
+                autoSize: true,
+                clickEventForward: false,
+                disableFlipByClick: false
+            });
+
+            // Charger les pages
+            pageFlip.loadFromHTML(document.querySelectorAll('.page'));
+
+            // Événements
+            pageFlip.on('flip', (e) => {
+                updateProgress();
+                updateButtons();
+            });
+
+
+            pageFlip.on('init', (e) => {
+                totalPages = pageFlip.getPageCount();
+                console.log('✅ StPageFlip avec RTL natif initialisé -', totalPages, 'pages');
+                console.log('🔄 Mode RTL natif:', isRTL);
+                
+                // Configurer l'interception des événements de survol pour RTL
+                if (isRTL) {
+                    setupRTLEventInterception();
+                }
+            });
+
+            // Finaliser l'initialisation
+            setTimeout(() => {
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('progressContainer').style.display = 'block';
+                document.getElementById('controls').style.display = 'flex';
+                
+                totalPages = pageFlip.getPageCount();
+                updateProgress();
+                updateButtons();
+                
+                console.log('📚 Livre From Scratch prêt - RTL Interception:', isRTL);
+            }, 1500);
+        });
+
+        // ===== TEXT ZOOM CONTROLS =====
+        let textZoom = 1.0;
+        const zoomStep = 0.1;
+        const minZoom = 0.7;
+        const maxZoom = 1.6;
+
+        function zoomIn() {
+            if (textZoom < maxZoom) {
+                textZoom += zoomStep;
+                applyTextZoom();
+                console.log('🔍 Text Zoom In:', textZoom.toFixed(1));
+            }
+        }
+
+        function zoomOut() {
+            if (textZoom > minZoom) {
+                textZoom -= zoomStep;
+                applyTextZoom();
+                console.log('🔍 Text Zoom Out:', textZoom.toFixed(1));
+            }
+        }
+
+        function applyTextZoom() {
+            // Appliquer le zoom via CSS custom property
+            document.documentElement.style.setProperty('--text-zoom', textZoom);
+        }
+
+
+        // ===== NAVIGATION DIRECTIONNELLE =====
+        function turnLeft() {
+            if (pageFlip) {
+                console.log('🔄 Navigation: Turn Left (<)');
+                // < = reculer dans le livre = flipPrev dans StPageFlip
+                pageFlip.flipPrev();
+            }
+        }
+
+        function turnRight() {
+            if (pageFlip) {
+                console.log('🔄 Navigation: Turn Right (>)');
+                const currentPage = pageFlip.getCurrentPageIndex();
+                
+                // Si on est sur la COVER (page 0), aller directement à la page 1
+                if (currentPage === 0) {
+                    console.log('🔄 Depuis COVER: Aller à page 1');
+                    pageFlip.flip(1);
+                } else {
+                    // Sinon, navigation normale
+                    pageFlip.flipNext();
+                }
+            }
+        }
+
+        function goToPage(pageIndex) {
+            if (pageFlip) {
+                console.log('🔄 Navigation: Go to Page', pageIndex);
+                pageFlip.flip(pageIndex);
+            }
+        }
+
+        function goToHome() {
+            if (pageFlip) {
+                console.log('🏠 Navigation: Retour à la COVER (index 0)');
+                pageFlip.flip(0);
+            }
+        }
+
+        // ===== MISE À JOUR UI =====
+        function updateProgress() {
+            if (!pageFlip) return;
+            
+            const currentPage = pageFlip.getCurrentPageIndex();
+            const progressText = document.getElementById('progressText');
+            const progressFill = document.getElementById('progressFill');
+            
+            if (progressText && progressFill) {
+                const displayPage = currentPage + 1;
+                const progressPercent = (currentPage / (totalPages - 1)) * 100;
+                
+                progressText.textContent = `Page ${displayPage} / ${totalPages}`;
+                progressFill.style.width = `${Math.max(0, Math.min(100, progressPercent))}%`;
+            }
+        }
+
+        function updateButtons() {
+            if (!pageFlip) return;
+            
+            const currentPage = pageFlip.getCurrentPageIndex();
+            const leftBtn = document.getElementById('leftBtn');
+            const rightBtn = document.getElementById('rightBtn');
+            
+            if (leftBtn && rightBtn) {
+                // Sur la COVER (page 0), seul le bouton > est activé pour avancer
+                if (currentPage === 0) {
+                    leftBtn.disabled = true;   // < désactivé sur COVER 
+                    rightBtn.disabled = false; // > activé sur COVER pour avancer vers index 1-2
+                    console.log('🔄 COVER: Seul > disponible pour avancer');
+                } else {
+                    // Sur les autres pages, les deux boutons sont disponibles selon la position
+                    leftBtn.disabled = currentPage >= totalPages - 1;
+                    rightBtn.disabled = currentPage <= 0;
+                }
+            }
+        }
+
+        // updateLanguageTexts supprimée - plus nécessaire avec < et >
+
+        // ===== SUPPORT CLAVIER =====
+        document.addEventListener('keydown', function(e) {
+            switch(e.which) {
+                case 37: // Flèche gauche
+                    turnRight(); // Flèche gauche = >
+                    break;
+                case 39: // Flèche droite  
+                    turnLeft(); // Flèche droite = <
+                    break;
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="{{book.language}}" dir="{{book.direction}}">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{book.title}}</title>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400;1,500;1,600&display=swap" rel="stylesheet">
+    
+    <style>
+        {{{styles}}}
+        
+        /* ===== STPAGEFLIP RTL STYLES ===== */
+        body {
+            font-family: var(--font-primary);
+            background: linear-gradient(135deg, var(--tertiary-color) 0%, #e8eff2 100%);
+            margin: 0;
+            padding: 20px;
+            color: var(--primary-color);
+        }
+
+        .book-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            flex-direction: column;
+        }
+
+        .flip-book {
+            box-shadow: 0 0 20px 0 rgba(50, 62, 72, 0.4);
+        }
+
+        .page {
+            padding: 40px;
+            background-color: white;
+            color: var(--primary-color);
+            border: 1px solid var(--tertiary-dark);
+            overflow: hidden;
+            box-sizing: border-box;
+        }
+
+        .page-content {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+        }
+
+        /* ===== NAVIGATION ===== */
+        .controls {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 1000;
+            display: flex;
+            gap: 15px;
+            background: rgba(255,255,255,0.95);
+            padding: 15px 25px;
+            border-radius: 25px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+        }
+
+        .control-button {
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            font-family: var(--font-primary);
+        }
+
+        .control-button:hover {
+            background: var(--primary-light);
+            transform: translateY(-2px);
+        }
+
+        .control-button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* ===== PROGRESS ===== */
+        .progress-container {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: rgba(255,255,255,0.95);
+            padding: 15px 20px;
+            border-radius: 20px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+            z-index: 1000;
+            font-family: var(--font-primary);
+        }
+
+        [dir="rtl"] .progress-container {
+            right: auto;
+            left: 20px;
+        }
+
+        .progress-text {
+            font-size: 14px;
+            color: var(--primary-color);
+            margin-bottom: 8px;
+            text-align: center;
+        }
+
+        .progress-bar {
+            width: 120px;
+            height: 4px;
+            background: var(--tertiary-color);
+            border-radius: 2px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: var(--secondary-color);
+            width: 0%;
+            transition: width 0.5s ease;
+        }
+
+        /* ===== LOADING ===== */
+        .loading {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+            text-align: center;
+            z-index: 1000;
+        }
+
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid var(--tertiary-color);
+            border-top: 4px solid var(--secondary-color);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 15px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* ===== TYPOGRAPHIE ===== */
+        .page h1 {
+            color: var(--primary-color);
+            font-size: 1.8rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            text-align: center;
+            border-bottom: 2px solid var(--secondary-color);
+            padding-bottom: 0.8rem;
+        }
+
+        .page h2 {
+            color: var(--primary-color);
+            font-size: 1.4rem;
+            font-weight: 600;
+            margin: 1rem 0 0.8rem 0;
+            border-left: 3px solid var(--secondary-color);
+            padding-left: 1rem;
+        }
+
+        .page p {
+            margin-bottom: 0.6rem;
+            text-align: justify;
+            line-height: 1.4;
+            font-size: 0.95rem;
+        }
+
+        /* ===== RTL SUPPORT ===== */
+        [dir="rtl"] .page h2 {
+            border-left: none;
+            border-right: 3px solid var(--secondary-color);
+            padding-left: 0;
+            padding-right: 1rem;
+        }
+
+        [dir="rtl"] .page p {
+            text-align: right;
+        }
+
+        /* ===== QUILL STYLES ===== */
+        .ql-size-small { font-size: 0.75em; }
+        .ql-size-large { font-size: 1.5em; }
+        .ql-size-huge  { font-size: 2.5em; }
+        .ql-align-right { text-align: right !important; }
+        .ql-align-center { text-align: center !important; }
+        .ql-align-justify { text-align: justify !important; }
+        .ql-direction-rtl { direction: rtl; }
+
+        /* ===== PAGE COVERS ===== */
+        .page-cover {
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-light));
+            color: white;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .page-cover h1 {
+            color: inherit;
+            border-bottom-color: var(--secondary-color);
+            font-size: 2.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .page-cover h2,
+        .page-cover h3 {
+            color: inherit;
+        }
+    </style>
+</head>
+<body>
+    <!-- Loading -->
+    <div class="loading" id="loading">
+        <div class="spinner"></div>
+        <div style="color: var(--primary-color); font-weight: 600;">Chargement du livre digital...</div>
+    </div>
+
+    <!-- Progress -->
+    <div class="progress-container" id="progressContainer" style="display: none;">
+        <div class="progress-text" id="progressText">Page 1 / {{pages.length}}</div>
+        <div class="progress-bar">
+            <div class="progress-fill" id="progressFill"></div>
+        </div>
+    </div>
+
+    <!-- Book Container -->
+    <div class="book-container">
+        <div class="flip-book" id="book">
+            {{{body}}}
+        </div>
+    </div>
+
+    <!-- Controls -->
+    <div class="controls" id="controls" style="display: none;">
+        <button class="control-button" onclick="prevPage()" id="prevBtn">← Précédent</button>
+        <button class="control-button" onclick="goToHome()">Sommaire</button>
+        <button class="control-button" onclick="nextPage()" id="nextBtn">Suivant →</button>
+    </div>
+
+    <!-- StPageFlip RTL -->
+    <script src="stpageflip-rtl.min.js"></script>
+    
+    <script>
+        let pageFlip;
+        let totalPages = 0;
+        let isRTL = document.documentElement.dir === 'rtl';
+
+        // Initialisation
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('🚀 Initialisation StPageFlip RTL - Direction:', isRTL ? 'RTL' : 'LTR');
+            
+            // Configuration StPageFlip avec support RTL
+            pageFlip = new St.PageFlip(document.getElementById('book'), {
+                width: 550,
+                height: 733,
+                size: 'stretch',
+                minWidth: 280,
+                maxWidth: 900,
+                minHeight: 420,
+                maxHeight: 1350,
+                maxShadowOpacity: 0.7,
+                showCover: true,
+                mobileScrollSupport: false,
+                flippingTime: 1000,
+                usePortrait: true,
+                startPage: 0,
+                drawShadow: true,
+                autoSize: true,
+                clickEventForward: true,
+                rtl: isRTL  // ✅ Activation RTL native
+            });
+
+            // Charger les pages
+            pageFlip.loadFromHTML(document.querySelectorAll('.page'));
+
+            // Événements
+            pageFlip.on('flip', (e) => {
+                updateProgress();
+                updateButtons();
+            });
+
+            pageFlip.on('init', (e) => {
+                totalPages = pageFlip.getPageCount();
+                console.log('✅ StPageFlip initialisé -', totalPages, 'pages');
+            });
+
+            // Finaliser l'initialisation
+            setTimeout(() => {
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('progressContainer').style.display = 'block';
+                document.getElementById('controls').style.display = 'flex';
+                
+                totalPages = pageFlip.getPageCount();
+                updateProgress();
+                updateButtons();
+                updateLanguageTexts();
+                
+                console.log('📚 Livre prêt - RTL:', isRTL);
+            }, 1000);
+        });
+
+        // Navigation
+        function nextPage() {
+            if (pageFlip) {
+                pageFlip.flipNext();
+            }
+        }
+
+        function prevPage() {
+            if (pageFlip) {
+                pageFlip.flipPrev();
+            }
+        }
+
+        function goToPage(pageIndex) {
+            if (pageFlip) {
+                pageFlip.flip(pageIndex);
+            }
+        }
+
+        function goToHome() {
+            if (pageFlip) {
+                // Rechercher la page sommaire
+                const pages = document.querySelectorAll('.page');
+                let sommaireIndex = 1; // Par défaut page 1
+                
+                for (let i = 0; i < pages.length; i++) {
+                    const content = pages[i].innerHTML.toLowerCase();
+                    if (content.includes('sommaire') || content.includes('الفهرس')) {
+                        sommaireIndex = i;
+                        break;
+                    }
+                }
+                
+                pageFlip.flip(sommaireIndex);
+            }
+        }
+
+        // Mise à jour progression
+        function updateProgress() {
+            if (!pageFlip) return;
+            
+            const currentPage = pageFlip.getCurrentPageIndex();
+            const progressText = document.getElementById('progressText');
+            const progressFill = document.getElementById('progressFill');
+            
+            if (progressText && progressFill) {
+                const displayPage = currentPage + 1;
+                const progressPercent = (currentPage / (totalPages - 1)) * 100;
+                
+                progressText.textContent = `Page ${displayPage} / ${totalPages}`;
+                progressFill.style.width = `${Math.max(0, Math.min(100, progressPercent))}%`;
+            }
+        }
+
+        // Mise à jour boutons
+        function updateButtons() {
+            if (!pageFlip) return;
+            
+            const currentPage = pageFlip.getCurrentPageIndex();
+            const prevBtn = document.getElementById('prevBtn');
+            const nextBtn = document.getElementById('nextBtn');
+            
+            if (prevBtn) {
+                prevBtn.disabled = currentPage <= 0;
+            }
+            
+            if (nextBtn) {
+                nextBtn.disabled = currentPage >= totalPages - 1;
+            }
+        }
+
+        // Adaptation des textes selon la langue
+        function updateLanguageTexts() {
+            const prevBtn = document.getElementById('prevBtn');
+            const nextBtn = document.getElementById('nextBtn');
+            const progressText = document.getElementById('progressText');
+            
+            if (isRTL) {
+                if (prevBtn) prevBtn.innerHTML = '→ التالي';
+                if (nextBtn) nextBtn.innerHTML = '← السابق';
+            } else {
+                if (prevBtn) prevBtn.innerHTML = '← Précédent';
+                if (nextBtn) nextBtn.innerHTML = 'Suivant →';
+            }
+        }
+
+        // Support clavier
+        document.addEventListener('keydown', function(e) {
+            switch(e.which) {
+                case 37: // Flèche gauche
+                    prevPage();
+                    break;
+                case 39: // Flèche droite
+                    nextPage();
+                    break;
+            }
+        });
+    </script>
+</body>
+</html>

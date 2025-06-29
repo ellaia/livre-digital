@@ -1,0 +1,1161 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="screen-orientation" content="portrait">
+    <meta name="orientation" content="portrait">
+    <title>خواطر من أعماق الروح</title>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400;1,500;1,600&display=swap" rel="stylesheet">
+    
+    <style>
+        
+        /* ===== VARIABLES CSS SIMPLIFIÉES ===== */
+        :root {
+            --cover-end-background-color: #184777;
+            --global-font: 'Arial', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            --separator-color: #363635;
+            --cover-end-separator-color: #ffffff;
+            
+            /* Variables de compatibilité pour l'ancien système */
+            --font-primary: 'Arial', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            --font-secondary: 'Arial', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            --primary-color: #323e48;
+            --secondary-color: #363635;
+            --tertiary-color: #184777;
+        }
+
+        /* ===== STYLES POUR PAGES COVER ET FIN ===== */
+        .page[data-page-type="cover"],
+        .page[data-page-type="end"] {
+            background-color: var(--cover-end-background-color) !important;
+        }
+
+        /* ===== STYLES POUR LES SÉPARATEURS DE TITRES ===== */
+        .page h1::after {
+            content: '';
+            display: block;
+            width: 100%;
+            height: 2px;
+            background-color: var(--separator-color);
+            margin: 20px 0 25px 0;
+        }
+
+        /* Trait de séparation spécifique pour pages COVER et FIN */
+        .page[data-page-type="cover"] h1::after,
+        .page[data-page-type="end"] h1::after {
+            background-color: var(--cover-end-separator-color);
+        }
+
+        /* ===== POLICE GLOBALE ===== */
+        body, .page, .page-content, h1, h2, h3, h4, h5, h6, p, div, span {
+            font-family: var(--global-font) !important;
+        }
+
+        /* ===== PANNEAU DE CONTRÔLE THÉMATIQUE ===== */
+        .control-button {
+            background: var(--cover-end-background-color) !important;
+            color: white !important;
+            font-family: var(--global-font) !important;
+        }
+
+        .control-button:hover {
+            background: var(--separator-color) !important;
+            color: white !important;
+        }
+
+        .control-button:disabled,
+        .control-button.disabled {
+            background: #cccccc !important;
+            color: #666666 !important;
+            cursor: not-allowed !important;
+            opacity: 0.6 !important;
+        }
+
+        .control-button:disabled:hover,
+        .control-button.disabled:hover {
+            background: #cccccc !important;
+            color: #666666 !important;
+        }
+
+        .home-button {
+            background: var(--cover-end-background-color) !important;
+            color: white !important;
+        }
+
+        .home-button:hover {
+            background: var(--separator-color) !important;
+            color: white !important;
+        }
+
+        .book-zoom-slider, .text-zoom-slider {
+            background: var(--cover-end-background-color) !important;
+        }
+
+        .book-zoom-slider::-webkit-slider-thumb, 
+        .text-zoom-slider::-webkit-slider-thumb {
+            background: white !important;
+            border: 2px solid var(--separator-color) !important;
+        }
+        
+        .book-zoom-slider::-moz-range-thumb,
+        .text-zoom-slider::-moz-range-thumb {
+            background: white !important;
+            border: 2px solid var(--separator-color) !important;
+        }
+
+        .text-zoom-label {
+            color: var(--separator-color) !important;
+        }
+
+        /* ===== SUPPORT RTL PROPRE (sans transformation CSS) ===== */
+        [dir="rtl"] {
+            --text-align-start: right;
+            --text-align-end: left;
+            --margin-start: margin-right;
+            --margin-end: margin-left;
+            --padding-start: padding-right;
+            --padding-end: padding-left;
+            --border-start: border-right;
+            --border-end: border-left;
+        }
+
+        [dir="ltr"] {
+            --text-align-start: left;
+            --text-align-end: right;
+            --margin-start: margin-left;
+            --margin-end: margin-right;
+            --padding-start: padding-left;
+            --padding-end: padding-right;
+            --border-start: border-left;
+            --border-end: border-right;
+        }
+        
+        
+        /* ===== STPAGEFLIP FROM SCRATCH RTL STYLES ===== */
+        body {
+            font-family: var(--font-primary);
+            background: linear-gradient(135deg, var(--tertiary-color) 0%, #e8eff2 100%);
+            margin: 0;
+            padding: 20px;
+            color: var(--primary-color);
+        }
+
+        .book-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            flex-direction: column;
+        }
+
+        .flip-book {
+            box-shadow: 0 0 20px 0 rgba(50, 62, 72, 0.4);
+        }
+
+        /* ===== RTL FLIP BOOK POSITIONING ===== */
+        [dir="rtl"] .flip-book {
+            transform: scaleX(-1); /* Miroir horizontal pour RTL */
+        }
+
+        /* Appliquer scaleX seulement sur le contenu, pas sur la page entière */
+        [dir="rtl"] .page-content {
+            transform: scaleX(-1); /* Contre-miroir pour remettre le contenu à l'endroit */
+        }
+
+        .page {
+            padding: 40px;
+            background-color: white;
+            color: var(--primary-color);
+            border: 1px solid var(--tertiary-dark);
+            overflow: hidden;
+            box-sizing: border-box;
+        }
+
+        .page-content {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            font-size: calc(1rem * var(--text-zoom, 1));
+        }
+
+        /* ===== PANNEAU DE CONTRÔLE AMOVIBLE ===== */
+        .control-panel {
+            position: fixed;
+            top: 50%;
+            right: 20px;
+            transform: translateY(-50%);
+            background: rgba(255,255,255,0.95);
+            border-radius: 15px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+            z-index: 1000;
+            font-family: var(--font-primary);
+            backdrop-filter: blur(10px);
+            padding: 15px;
+            width: 180px;
+            height: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            user-select: none;
+        }
+
+        .control-panel-header {
+            cursor: move;
+            padding: 5px 0;
+            text-align: center;
+            font-size: 10px;
+            color: var(--primary-color);
+            opacity: 0.6;
+            border-bottom: 1px solid var(--tertiary-color);
+            margin-bottom: 5px;
+        }
+
+        .control-panel-header:hover {
+            opacity: 1;
+        }
+
+        /* ===== ORIENTATION MOBILE FORCÉE ===== */
+        @media screen and (max-width: 768px) {
+            @media (orientation: landscape) {
+                body::before {
+                    content: "📱 Veuillez tourner votre téléphone en mode portrait pour une meilleure expérience";
+                    position: fixed;
+                    top: 0;
+                    left: 0;
+                    width: 100%;
+                    height: 100%;
+                    background: rgba(0,0,0,0.9);
+                    color: white;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    text-align: center;
+                    z-index: 9999;
+                    font-size: 18px;
+                    padding: 20px;
+                    box-sizing: border-box;
+                    font-family: var(--font-primary);
+                    line-height: 1.5;
+                }
+                
+                [dir="rtl"] body::before {
+                    content: "📱 يرجى تدوير هاتفك إلى الوضع العمودي للحصول على تجربة أفضل";
+                    direction: rtl;
+                }
+                
+                .book-container,
+                .control-panel {
+                    display: none;
+                }
+            }
+        }
+
+        [dir="rtl"] .control-panel {
+            right: auto;
+            left: 20px;
+        }
+
+        .control-panel.dragging {
+            box-shadow: 0 12px 40px rgba(0,0,0,0.2);
+            transform: scale(1.02);
+        }
+
+        /* Page indicator en haut */
+        .page-indicator {
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .progress-text {
+            font-size: 12px;
+            color: var(--primary-color);
+            margin-bottom: 5px;
+            font-weight: 500;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 3px;
+            background: var(--tertiary-color);
+            border-radius: 2px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: var(--secondary-color);
+            width: 0%;
+            transition: width 0.5s ease;
+        }
+
+        /* Zone de navigation */
+        .navigation-area {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .control-button {
+            background: var(--cover-end-background-color, var(--primary-color));
+            color: white;
+            border: none;
+            padding: 5px 8px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 11px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            font-family: var(--global-font, var(--font-primary));
+        }
+
+        .control-button:hover {
+            background: var(--separator-color, var(--secondary-color));
+            color: white;
+            transform: translateY(-1px);
+        }
+
+        .control-button:disabled,
+        .control-button.disabled {
+            background: #cccccc !important;
+            color: #666666 !important;
+            cursor: not-allowed !important;
+            opacity: 0.6 !important;
+            transform: none !important;
+        }
+
+        .control-button:disabled:hover,
+        .control-button.disabled:hover {
+            background: #cccccc !important;
+            color: #666666 !important;
+            transform: none !important;
+        }
+
+        .home-button {
+            background: var(--cover-end-background-color, var(--secondary-color)) !important;
+            color: white !important;
+            font-size: 12px;
+        }
+
+        .home-button:hover {
+            background: var(--separator-color, var(--secondary-light)) !important;
+            color: white !important;
+        }
+
+        /* Zone de zoom livre horizontal */
+        .book-zoom-area {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .book-zoom-label {
+            font-size: 10px;
+            color: var(--primary-color);
+            font-weight: 600;
+            user-select: none;
+            min-width: 15px;
+            text-align: center;
+        }
+
+        .book-zoom-slider {
+            flex: 1;
+            height: 6px;
+            border-radius: 3px;
+            background: var(--cover-end-background-color, var(--tertiary-color));
+            outline: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            -webkit-appearance: none;
+            appearance: none;
+        }
+
+        .book-zoom-slider::-webkit-slider-thumb {
+            appearance: none;
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            background: white;
+            border: 2px solid var(--separator-color, var(--primary-color));
+            cursor: pointer;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+            transition: all 0.3s ease;
+        }
+
+        .book-zoom-slider::-webkit-slider-thumb:hover {
+            background: white;
+            border: 2px solid var(--separator-color, var(--primary-light));
+            transform: scale(1.1);
+        }
+
+        .book-zoom-slider::-moz-range-thumb {
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            background: white;
+            border: 2px solid var(--separator-color, var(--primary-color));
+            cursor: pointer;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+
+        /* Zone de zoom texte horizontal */
+        .text-zoom-area {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .text-zoom-label {
+            font-size: 8px;
+            color: var(--separator-color, var(--secondary-color));
+            font-weight: 500;
+            user-select: none;
+            min-width: 15px;
+            text-align: center;
+        }
+
+        .text-zoom-label-big {
+            font-size: 11px;
+            font-weight: 600;
+        }
+
+        .text-zoom-slider {
+            flex: 1;
+            height: 6px;
+            border-radius: 3px;
+            background: var(--cover-end-background-color, var(--tertiary-color));
+            outline: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            -webkit-appearance: none;
+            appearance: none;
+        }
+
+        .text-zoom-slider::-webkit-slider-thumb {
+            appearance: none;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: white;
+            border: 2px solid var(--separator-color, var(--secondary-color));
+            cursor: pointer;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+            transition: all 0.3s ease;
+        }
+
+        .text-zoom-slider::-webkit-slider-thumb:hover {
+            background: white;
+            border: 2px solid var(--separator-color, var(--secondary-light));
+            transform: scale(1.1);
+        }
+
+        .text-zoom-slider::-moz-range-thumb {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: white;
+            border: 2px solid var(--separator-color, var(--secondary-color));
+            cursor: pointer;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+
+        /* ===== LOADING ===== */
+        .loading {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+            text-align: center;
+            z-index: 1000;
+        }
+
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid var(--tertiary-color);
+            border-top: 4px solid var(--secondary-color);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 15px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* ===== TYPOGRAPHIE ===== */
+        .page h1 {
+            color: var(--primary-color);
+            font-size: calc(1.8rem * var(--text-zoom, 1));
+            font-weight: 600;
+            margin-bottom: 1rem;
+            text-align: center;
+            padding-bottom: 0.8rem;
+        }
+
+        /* Trait de séparation de page sous H1 - pages normales */
+        .page h1::after {
+            content: '';
+            display: block;
+            width: 100%;
+            height: 2px;
+            background-color: var(--separator-color, var(--secondary-color));
+            margin: 20px 0 25px 0;
+        }
+
+        /* Trait de séparation de page sous H1 - pages COVER et FIN */
+        .page[data-page-type="cover"] h1::after,
+        .page[data-page-type="end"] h1::after {
+            background-color: var(--cover-end-separator-color, #ffffff);
+        }
+
+        .page h2 {
+            color: var(--primary-color);
+            font-size: calc(1.4rem * var(--text-zoom, 1));
+            font-weight: 600;
+            margin: 1rem 0 0.8rem 0;
+        }
+
+        .page p {
+            margin-bottom: 0.6rem;
+            text-align: justify;
+            line-height: 1.4;
+            font-size: calc(0.95rem * var(--text-zoom, 1));
+        }
+
+        /* ===== RTL SUPPORT ===== */
+
+        [dir="rtl"] .page p {
+            text-align: right;
+        }
+
+        /* ===== QUILL STYLES AVEC ZOOM PROPORTIONNEL ===== */
+        .ql-size-small { font-size: calc(0.75em * var(--text-zoom, 1)); }
+        .ql-size-large { font-size: calc(1.5em * var(--text-zoom, 1)); }
+        .ql-size-huge  { font-size: calc(2.5em * var(--text-zoom, 1)); }
+        .ql-align-right { text-align: right !important; }
+        .ql-align-center { text-align: center !important; }
+        .ql-align-justify { text-align: justify !important; }
+        .ql-direction-rtl { direction: rtl; }
+
+        /* ===== PAGE COVERS ===== */
+        .page-cover {
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-light));
+            color: white;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .page-cover h1 {
+            color: inherit;
+            border-bottom-color: var(--secondary-color);
+            font-size: 2.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .page-cover h2,
+        .page-cover h3 {
+            color: inherit;
+        }
+
+    </style>
+</head>
+<body>
+    <!-- Loading -->
+    <div class="loading" id="loading">
+        <div class="spinner"></div>
+        <div style="color: var(--primary-color); font-weight: 600;">Chargement du livre digital...</div>
+    </div>
+
+
+    <!-- Book Container -->
+    <div class="book-container">
+        <div class="flip-book" id="book">
+            <div class="page page-cover hard" data-page-type="cover" role="article" aria-label="Page 1">
+    <div class="page-content">
+        <h1 class="ql-align-center">خواطر من أعماق الروح</h1><h2 class="ql-align-center ql-direction-rtl">رحلة في دهاليز النفس البشرية</h2><p class="ql-align-center ql-direction-rtl"><strong><em>مجموعة تأملات شخصية</em></strong></p><p class="ql-align-center ql-direction-rtl"><em>تأملات صادقة من واقع التجربة والحياة</em></p><p class="ql-align-center ql-direction-rtl"><em> قصص حقيقية، دروس مستخلصة، ذكريات لا تُنسى</em></p><p class="ql-align-center ql-direction-rtl"><div style="text-align: center; margin: 1rem 0;">
+                <div class="media-placeholder" style="display: inline-block; width: auto; margin: 0; padding: 0.5rem;">
+                    <img src="media/7.jpeg" alt="Description" style="max-width: 100%; height: auto; border-radius: 6px; width: 100%;">
+                    <p style="font-style: italic; margin-top: 0.5rem; font-size: 0.9rem;">Description</p>
+                </div>
+            </div></p>
+    </div>
+</div>
+
+<div class="page " data-page-type="sommaire" role="article" aria-label="Page 2">
+    <div class="page-content">
+        <h1 class="ql-align-center ql-direction-rtl">الفهرس</h1><h2 class="ql-align-center ql-direction-rtl">محتويات الكتاب</h2><h3 class="ql-direction-rtl">الخاطرة الأولى</h3><p class="ql-direction-rtl"><em>أسير السلطة - قصة الشاب والقهوة</em></p><p class="ql-direction-rtl"><br></p><h3 class="ql-direction-rtl">الخاطرة الثانية</h3><p class="ql-direction-rtl"><em>درس الوقت - قصة الأب والابنة</em></p><p class="ql-direction-rtl"><br></p><h3 class="ql-direction-rtl">الخاطرة الثالثة</h3><p class="ql-direction-rtl"><em>الندم الذي لا يشفى - ذكرى الأم</em></p><p class="ql-direction-rtl"><br></p><h3 class="ql-direction-rtl">الخاطرة الرابعة</h3><p class="ql-direction-rtl"><em>مشاريع الذكاء الاصطناعي - لماذا تفشل؟</em></p><p class="ql-align-center ql-direction-rtl"><em>كل خاطرة تحمل تجربة، وكل تجربة تحمل درساً</em></p>
+    </div>
+</div>
+
+<div class="page " data-page-type="content" role="article" aria-label="Page 3">
+    <div class="page-content">
+        <h1 class="ql-align-center ql-direction-rtl">السبت، الواحد والعشرون من يونيو، أكتب دون فلتر</h1><p class="ql-align-center ql-direction-rtl"><div style="text-align: center; margin: 1rem 0;">
+                <div class="media-placeholder" style="display: inline-block; width: auto; margin: 0; padding: 0.4rem;">
+                    <img src="media/10.jpeg" alt="Image" style="max-width: 100%; height: auto; border-radius: 6px; width: 25%;">
+                    <p style="font-style: italic; margin-top: 0.5rem; font-size: 0.9rem;"></p>
+                </div>
+            </div></p><p class="ql-direction-rtl">كان يحرّك ملعقته في فنجان قهوته <strong style="color: rgb(231, 76, 60);">بحركة آلية، متواصلة، مُزعجة</strong>. كأنه يحاول إذابة شيء غير السكر. سألته عن أخباره، وإن كان قد وجد منصب عمل. أومأ برأسه: <em>«نعم، منذ شهرين.»</em></p><p class="ql-direction-rtl">فرحت له، وسألته عن طبيعة العمل. نظر إليّ بنظرة غريبة وقال: <em>«مناسب.»</em> ثم عاد لتحريك ملعقته. لاحظت أنه لم يشرب منها ولا رشفة واحدة منذ أن جلست.</p><p class="ql-direction-rtl"><em>«مناسب» كلمة تحمل في طياتها الكثير من المعاني. أحياناً تعني الرضا، وأحياناً أخرى تعني الاستسلام.</em></p><p class="ql-direction-rtl">حاولت أن أجعل المحادثة أكثر حيوية، سألته عن زملائه، عن مديره، عن المشاريع التي يعمل عليها. في كل مرة كانت إجابته مقتضبة، مُحبطة: <em>«عاديين»، «مقبول»، «مناسب».</em></p><p class="ql-direction-rtl">ثم فجأة، توقف عن تحريك الملعقة ونظر إليّ مباشرة: <strong style="color: rgb(214, 48, 49);">«أتعرف ما المشكلة؟ المشكلة أنني لست أنا.»</strong></p><p class="ql-direction-rtl">شرح لي كيف أنه يضطر يومياً لأن يقول <em>«نعم»</em> لأشياء لا يؤمن بها، وأن يبتسم لأشخاص لا يحترمهم، وأن يدعي اهتماماً بمشاريع يعتبرها مضيعة للوقت.</p><p class="ql-direction-rtl"><strong>«كل يوم أستيقظ وأرتدي قناعاً. وفي النهاية، لم أعد أعرف أين انتهى القناع وأين بدأ وجهي الحقيقي.»</strong></p><p class="ql-direction-rtl">وأضاف بصوت أجش: <em>«المرتب جيد، المنصب محترم، الشركة معروفة. من الخارج كل شيء مثالي. لكن من الداخل... من الداخل أشعر أنني أموت ببطء.»</em></p><p class="ql-direction-rtl"><em>هذه هي اللحظة التي أدركت فيها أن صديقي لم يجد وظيفة. بل أن الوظيفة وجدته هو، وابتلعته.</em></p>
+    </div>
+</div>
+
+<div class="page " data-page-type="content" role="article" aria-label="Page 4">
+    <div class="page-content">
+        <p><div style="text-align: center; margin: 1rem 0;">
+                <div class="media-placeholder" style="display: inline-block; width: auto; margin: 0; padding: 0.5rem;">
+                    <img src="media/9.jpeg" alt="Description" style="max-width: 100%; height: auto; border-radius: 6px; width: 100%;">
+                    <p style="font-style: italic; margin-top: 0.5rem; font-size: 0.9rem;">Description</p>
+                </div>
+            </div></p>
+    </div>
+</div>
+
+<div class="page page-cover hard" data-page-type="end" role="article" aria-label="Page 5">
+    <div class="page-content">
+        <h1 class="ql-align-center">النهاية</h1><p class="ql-align-center">شكراً لك على هذه الرحلة</p><p class="ql-align-center"><em>هذه نهاية رحلتنا في هذه التأملات الشخصية</em></p><p class="ql-align-center"><em> أتمنى أن تكون وجدت فيها شيئاً يلامس قلبك أو عقلك</em></p><p class="ql-align-center"><strong>تذكر: كل يوم هو صفحة جديدة في كتاب حياتك</strong></p><p class="ql-align-center"><strong> اكتبها بصدق وعيشها بحب</strong></p><p class="ql-align-center"><em>مع تحيات مؤلف هذه الخواطر</em></p><p class="ql-align-center"><em> يونيو 2024</em></p><p class="ql-align-center"><em>"الحياة ليست في عدد الأنفاس التي نتنفسها، بل في اللحظات التي تحبس أنفاسنا"</em></p><p class="ql-align-center"><br></p><h1 class="ql-align-center"><br></h1>
+    </div>
+</div>
+
+
+        </div>
+    </div>
+
+    <!-- Panneau de contrôle amovible -->
+    <div class="control-panel" id="controlPanel" style="display: none;">
+        <!-- Header pour drag -->
+        <div class="control-panel-header" id="controlPanelHeader">☰</div>
+        
+        <!-- Page indicator en haut -->
+        <div class="page-indicator">
+            <div class="progress-text" id="progressText">1 / 5</div>
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
+        </div>
+
+        <!-- Navigation -->
+        <div class="navigation-area">
+            <button class="control-button" onclick="turnLeft()" id="leftBtn">&lt;</button>
+            <button class="control-button home-button" onclick="goToHome()" id="homeBtn">⌂</button>
+            <button class="control-button" onclick="turnRight()" id="rightBtn">&gt;</button>
+        </div>
+
+        <!-- Zoom livre horizontal -->
+        <div class="book-zoom-area">
+            <div class="book-zoom-label">-</div>
+            <input type="range" class="book-zoom-slider" id="bookZoomSlider" 
+                   min="0.5" max="2.0" step="0.1" value="1.0">
+            <div class="book-zoom-label">+</div>
+        </div>
+
+        <!-- Zoom texte horizontal -->
+        <div class="text-zoom-area">
+            <div class="text-zoom-label">Aa</div>
+            <input type="range" class="text-zoom-slider" id="textZoomSlider" 
+                   min="0.7" max="1.6" step="0.1" value="1.0">
+            <div class="text-zoom-label text-zoom-label-big">Aa</div>
+        </div>
+    </div>
+
+    <!-- StPageFlip ORIGINAL CDN -->
+    <script src="https://unpkg.com/page-flip@2.0.7/dist/js/page-flip.browser.js"></script>
+    
+    <script>
+        let pageFlip;
+        let totalPages = 0;
+        let isRTL = document.documentElement.dir === 'rtl';
+        let originalEventHandlers = new Map();
+
+        console.log('🚀 RTL From Scratch - Direction:', isRTL ? 'RTL' : 'LTR');
+
+        // ===== INTERCEPTION ÉVÉNEMENTS SURVOL RTL =====
+        function setupRTLEventInterception() {
+            if (!isRTL) {
+                console.log('📘 Mode LTR - Pas d\'interception nécessaire');
+                return;
+            }
+
+            console.log('🔧 RTL - Configuration interception des événements de survol');
+            
+            const bookElement = document.getElementById('book');
+            if (!bookElement) return;
+
+            // Intercepter les événements de survol et mouvement
+            const eventsToIntercept = [
+                'mousemove', 'mouseenter', 'mouseleave'
+            ];
+
+            eventsToIntercept.forEach(eventType => {
+                const originalHandler = function(event) {
+                    // Stocker l'événement original temporairement
+                    const originalX = event.clientX;
+                    const rect = bookElement.getBoundingClientRect();
+                    const bookLeft = rect.left;
+                    const bookRight = rect.right;
+                    
+                    // Calculer la nouvelle position X inversée
+                    const newX = bookRight - (originalX - bookLeft);
+                    
+                    // Modifier directement les propriétés de l'événement
+                    Object.defineProperty(event, 'clientX', {
+                        value: newX,
+                        writable: true
+                    });
+                    Object.defineProperty(event, 'pageX', {
+                        value: event.pageX - (originalX - newX),
+                        writable: true
+                    });
+                    
+                    console.log(`🔄 RTL Survol: ${originalX} → ${newX}`);
+                };
+                
+                bookElement.addEventListener(eventType, originalHandler, true);
+                originalEventHandlers.set(eventType, originalHandler);
+            });
+
+            console.log('✅ RTL - Interception des événements de survol activée');
+        }
+
+        function createRTLModifiedHoverEvent(originalEvent) {
+            const bookElement = document.getElementById('book');
+            const rect = bookElement.getBoundingClientRect();
+            
+            // Calculer les coordonnées inversées pour le survol
+            const originalX = originalEvent.clientX;
+            const bookLeft = rect.left;
+            const bookRight = rect.right;
+            
+            // Inversion horizontale pour corriger le survol RTL
+            const newX = bookRight - (originalX - bookLeft);
+
+            // Créer un nouvel événement avec les coordonnées corrigées
+            const newEvent = new MouseEvent(originalEvent.type, {
+                bubbles: originalEvent.bubbles,
+                cancelable: originalEvent.cancelable,
+                clientX: newX,
+                clientY: originalEvent.clientY,
+                button: originalEvent.button,
+                buttons: originalEvent.buttons,
+                detail: originalEvent.detail,
+                view: originalEvent.view,
+                pageX: originalEvent.pageX - (originalX - newX),
+                screenX: originalEvent.screenX - (originalX - newX)
+            });
+
+            return newEvent;
+        }
+
+        // ===== PANNEAU AMOVIBLE (DRAGGABLE) =====
+        let isDragging = false;
+        let dragStartX, dragStartY;
+        let panelStartX, panelStartY;
+
+        function initDraggablePanel() {
+            const panel = document.getElementById('controlPanel');
+            const header = document.getElementById('controlPanelHeader');
+            if (!panel || !header) return;
+
+            // Drag seulement depuis le header
+            header.addEventListener('mousedown', startDrag);
+            document.addEventListener('mousemove', drag);
+            document.addEventListener('mouseup', stopDrag);
+
+            // Support tactile
+            header.addEventListener('touchstart', startDragTouch);
+            document.addEventListener('touchmove', dragTouch);
+            document.addEventListener('touchend', stopDrag);
+        }
+
+        function startDrag(e) {
+            const panel = document.getElementById('controlPanel');
+            isDragging = true;
+            panel.classList.add('dragging');
+            
+            dragStartX = e.clientX;
+            dragStartY = e.clientY;
+            
+            const rect = panel.getBoundingClientRect();
+            panelStartX = rect.left;
+            panelStartY = rect.top;
+            
+            e.preventDefault();
+        }
+
+        function startDragTouch(e) {
+            const touch = e.touches[0];
+            const panel = document.getElementById('controlPanel');
+            isDragging = true;
+            panel.classList.add('dragging');
+            
+            dragStartX = touch.clientX;
+            dragStartY = touch.clientY;
+            
+            const rect = panel.getBoundingClientRect();
+            panelStartX = rect.left;
+            panelStartY = rect.top;
+            
+            e.preventDefault();
+        }
+
+        function drag(e) {
+            if (!isDragging) return;
+            
+            const panel = document.getElementById('controlPanel');
+            const deltaX = e.clientX - dragStartX;
+            const deltaY = e.clientY - dragStartY;
+            
+            const newX = panelStartX + deltaX;
+            const newY = panelStartY + deltaY;
+            
+            // Limiter aux bordures de l'écran
+            const maxX = window.innerWidth - panel.offsetWidth - 10;
+            const maxY = window.innerHeight - panel.offsetHeight - 10;
+            
+            const clampedX = Math.max(10, Math.min(maxX, newX));
+            const clampedY = Math.max(10, Math.min(maxY, newY));
+            
+            panel.style.left = clampedX + 'px';
+            panel.style.top = clampedY + 'px';
+            panel.style.right = 'auto';
+            panel.style.transform = 'none';
+            
+            e.preventDefault();
+        }
+
+        function dragTouch(e) {
+            if (!isDragging) return;
+            
+            const touch = e.touches[0];
+            const panel = document.getElementById('controlPanel');
+            const deltaX = touch.clientX - dragStartX;
+            const deltaY = touch.clientY - dragStartY;
+            
+            const newX = panelStartX + deltaX;
+            const newY = panelStartY + deltaY;
+            
+            const maxX = window.innerWidth - panel.offsetWidth - 10;
+            const maxY = window.innerHeight - panel.offsetHeight - 10;
+            
+            const clampedX = Math.max(10, Math.min(maxX, newX));
+            const clampedY = Math.max(10, Math.min(maxY, newY));
+            
+            panel.style.left = clampedX + 'px';
+            panel.style.top = clampedY + 'px';
+            panel.style.right = 'auto';
+            panel.style.transform = 'none';
+            
+            e.preventDefault();
+        }
+
+        function stopDrag() {
+            if (!isDragging) return;
+            
+            isDragging = false;
+            const panel = document.getElementById('controlPanel');
+            if (panel) {
+                panel.classList.remove('dragging');
+            }
+        }
+
+        // ===== FORCER ORIENTATION PORTRAIT SUR MOBILE =====
+        function forcePortraitOrientation() {
+            // Vérifier si on est sur mobile
+            const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || 
+                            (window.innerWidth <= 768);
+            
+            if (isMobile && screen.orientation && screen.orientation.lock) {
+                try {
+                    screen.orientation.lock('portrait').then(() => {
+                        console.log('📱 Orientation forcée en portrait');
+                    }).catch((error) => {
+                        console.log('⚠️ Impossible de forcer l\'orientation:', error.message);
+                        // Fallback: message d'avertissement affiché via CSS
+                    });
+                } catch (error) {
+                    console.log('⚠️ Screen Orientation API non supportée');
+                }
+            }
+        }
+
+        // ===== DÉTECTION CHANGEMENT D'ORIENTATION =====
+        function handleOrientationChange() {
+            const isMobile = window.innerWidth <= 768;
+            const isLandscape = window.innerWidth > window.innerHeight;
+            
+            if (isMobile && isLandscape) {
+                console.log('📱 Mode paysage détecté sur mobile - Affichage du message');
+                // Le message sera affiché automatiquement via CSS
+            } else {
+                console.log('📱 Mode portrait - Affichage normal');
+            }
+        }
+
+        // ===== INITIALISATION STPAGEFLIP =====
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('🚀 Initialisation StPageFlip Original + Interception RTL');
+            
+            // Forcer l'orientation portrait sur mobile
+            forcePortraitOrientation();
+            
+            // Configuration StPageFlip - Mode "livre fermé" avec showCover
+            pageFlip = new St.PageFlip(document.getElementById('book'), {
+                width: 550,
+                height: 733,
+                size: 'stretch',
+                minWidth: 280,
+                maxWidth: 900,
+                minHeight: 420,
+                maxHeight: 1350,
+                maxShadowOpacity: 0.7,
+                showCover: true,   // COVER affichée seule comme un livre fermé
+                mobileScrollSupport: false,
+                flippingTime: 1000,
+                usePortrait: true,  // Mode portrait pour single page
+                startPage: 0,
+                drawShadow: true,
+                autoSize: true,
+                clickEventForward: false,
+                disableFlipByClick: false
+            });
+
+            // Charger les pages
+            pageFlip.loadFromHTML(document.querySelectorAll('.page'));
+
+            // Événements
+            pageFlip.on('flip', (e) => {
+                updateProgress();
+                updateButtons();
+            });
+
+
+            pageFlip.on('init', (e) => {
+                totalPages = pageFlip.getPageCount();
+                console.log('✅ StPageFlip avec RTL natif initialisé -', totalPages, 'pages');
+                console.log('🔄 Mode RTL natif:', isRTL);
+                
+                // Configurer l'interception des événements de survol pour RTL
+                if (isRTL) {
+                    setupRTLEventInterception();
+                }
+            });
+
+            // Finaliser l'initialisation
+            setTimeout(() => {
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('controlPanel').style.display = 'block';
+                
+                totalPages = pageFlip.getPageCount();
+                updateProgress();
+                updateButtons();
+                initTextZoom(); // Initialiser le slider de zoom texte
+                initBookZoom(); // Initialiser le slider de zoom livre
+                initDraggablePanel(); // Initialiser le panneau amovible
+                
+                console.log('📚 Livre From Scratch prêt - RTL Interception:', isRTL);
+            }, 1500);
+        });
+
+        // ===== ÉCOUTER LES CHANGEMENTS D'ORIENTATION =====
+        window.addEventListener('orientationchange', () => {
+            setTimeout(handleOrientationChange, 100);
+        });
+
+        window.addEventListener('resize', handleOrientationChange);
+
+        // ===== BOOK ZOOM CONTROLS =====
+        let bookZoom = 1.0;
+        const minBookZoom = 0.5;
+        const maxBookZoom = 2.0;
+
+        function initBookZoom() {
+            const slider = document.getElementById('bookZoomSlider');
+            if (slider) {
+                slider.addEventListener('input', function(e) {
+                    bookZoom = parseFloat(e.target.value);
+                    applyBookZoom();
+                    console.log('📖 Book Zoom Slider:', bookZoom.toFixed(1));
+                });
+            }
+        }
+
+        function applyBookZoom() {
+            const bookContainer = document.querySelector('.book-container');
+            if (bookContainer) {
+                bookContainer.style.transform = `scale(${bookZoom})`;
+                bookContainer.style.transformOrigin = 'center center';
+                bookContainer.style.transition = 'transform 0.3s ease';
+            }
+            
+            // Mettre à jour le slider si nécessaire
+            const slider = document.getElementById('bookZoomSlider');
+            if (slider && slider.value != bookZoom) {
+                slider.value = bookZoom;
+            }
+        }
+
+        // ===== TEXT ZOOM CONTROLS AVEC SLIDER =====
+        let textZoom = 1.0;
+        const minTextZoom = 0.7;
+        const maxTextZoom = 1.6;
+
+        function initTextZoom() {
+            const slider = document.getElementById('textZoomSlider');
+            if (slider) {
+                slider.addEventListener('input', function(e) {
+                    textZoom = parseFloat(e.target.value);
+                    applyTextZoom();
+                    console.log('🔍 Text Zoom Slider:', textZoom.toFixed(1));
+                });
+            }
+        }
+
+        function applyTextZoom() {
+            // Appliquer le zoom via CSS custom property
+            document.documentElement.style.setProperty('--text-zoom', textZoom);
+            
+            // Mettre à jour le slider si nécessaire
+            const slider = document.getElementById('textZoomSlider');
+            if (slider && slider.value != textZoom) {
+                slider.value = textZoom;
+            }
+        }
+
+        // Fonctions legacy pour compatibilité (si appelées depuis le code)
+        function zoomIn() {
+            textZoom = Math.min(maxTextZoom, textZoom + 0.1);
+            applyTextZoom();
+        }
+
+        function zoomOut() {
+            textZoom = Math.max(minTextZoom, textZoom - 0.1);
+            applyTextZoom();
+        }
+
+
+        // ===== NAVIGATION DIRECTIONNELLE =====
+        function turnLeft() {
+            if (pageFlip) {
+                console.log('🔄 Navigation: Turn Left (<)');
+                // < = reculer dans le livre = flipPrev dans StPageFlip
+                pageFlip.flipPrev();
+                // Mettre à jour les boutons après navigation
+                setTimeout(() => {
+                    updateButtons();
+                    updateProgress();
+                }, 100);
+            }
+        }
+
+        function turnRight() {
+            if (pageFlip) {
+                console.log('🔄 Navigation: Turn Right (>)');
+                const currentPage = pageFlip.getCurrentPageIndex();
+                
+                // Si on est sur la COVER (page 0), aller directement à la page 1
+                if (currentPage === 0) {
+                    console.log('🔄 Depuis COVER: Aller à page 1');
+                    pageFlip.flip(1);
+                } else {
+                    // Sinon, navigation normale
+                    pageFlip.flipNext();
+                }
+                // Mettre à jour les boutons après navigation
+                setTimeout(() => {
+                    updateButtons();
+                    updateProgress();
+                }, 100);
+            }
+        }
+
+        function goToPage(pageIndex) {
+            if (pageFlip) {
+                console.log('🔄 Navigation: Go to Page', pageIndex);
+                pageFlip.flip(pageIndex);
+                // Mettre à jour les boutons après navigation
+                setTimeout(() => {
+                    updateButtons();
+                    updateProgress();
+                }, 100);
+            }
+        }
+
+        function goToHome() {
+            if (pageFlip) {
+                console.log('🏠 Navigation: Retour à la COVER (index 0)');
+                pageFlip.flip(0);
+                // Mettre à jour les boutons après navigation
+                setTimeout(() => {
+                    updateButtons();
+                    updateProgress();
+                }, 100);
+            }
+        }
+
+        // ===== MISE À JOUR UI =====
+        function updateProgress() {
+            if (!pageFlip) return;
+            
+            const currentPage = pageFlip.getCurrentPageIndex();
+            const progressText = document.getElementById('progressText');
+            const progressFill = document.getElementById('progressFill');
+            
+            if (progressText && progressFill) {
+                const displayPage = currentPage + 1;
+                const progressPercent = (currentPage / (totalPages - 1)) * 100;
+                
+                progressText.textContent = `${displayPage} / ${totalPages}`;
+                progressFill.style.width = `${Math.max(0, Math.min(100, progressPercent))}%`;
+            }
+        }
+
+        function updateButtons() {
+            if (!pageFlip) return;
+            
+            const currentPage = pageFlip.getCurrentPageIndex();
+            const leftBtn = document.getElementById('leftBtn');
+            const rightBtn = document.getElementById('rightBtn');
+            
+            if (leftBtn && rightBtn) {
+                // Bouton < (reculer) : désactivé au début (page 0)
+                leftBtn.disabled = currentPage <= 0;
+                
+                // Bouton > (avancer) : désactivé à la fin (dernière page)
+                rightBtn.disabled = currentPage >= totalPages - 1;
+                
+                console.log(`🔄 Page ${currentPage + 1}/${totalPages} - < ${leftBtn.disabled ? 'désactivé' : 'actif'}, > ${rightBtn.disabled ? 'désactivé' : 'actif'}`);
+            }
+        }
+
+        // updateLanguageTexts supprimée - plus nécessaire avec < et >
+
+        // ===== SUPPORT CLAVIER =====
+        document.addEventListener('keydown', function(e) {
+            switch(e.which) {
+                case 37: // Flèche gauche
+                    turnRight(); // Flèche gauche = >
+                    break;
+                case 39: // Flèche droite  
+                    turnLeft(); // Flèche droite = <
+                    break;
+            }
+        });
+    </script>
+</body>
+</html>

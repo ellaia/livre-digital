@@ -1,0 +1,545 @@
+<!DOCTYPE html>
+<html lang="{{book.language}}" dir="{{book.direction}}">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{book.title}}</title>
+    
+    <!-- Métadonnées SEO et accessibilité -->
+    <meta name="description" content="{{book.description}}">
+    <meta name="keywords" content="{{book.keywords}}">
+    <meta name="author" content="{{book.author}}">
+    <meta name="robots" content="index, follow">
+    <meta property="og:title" content="{{book.title}}">
+    <meta property="og:description" content="{{book.description}}">
+    <meta property="og:type" content="website">
+    <meta name="theme-color" content="{{theme.primary_color}}">
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400;1,500;1,600&display=swap" rel="stylesheet">
+    
+    <!-- jQuery pour BookBlock -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    
+    <!-- BookBlock CSS et JavaScript -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/modernizr/2.8.3/modernizr.min.js"></script>
+    
+    <style>
+        {{{styles}}}
+        
+        /* ===== BOOKBLOCK CORE STYLES ===== */
+        .bb-bookblock {
+            width: 100%;
+            max-width: 1200px;
+            height: 80vh;
+            min-height: 600px;
+            margin: 20px auto;
+            position: relative;
+            z-index: 100;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+            background: rgba(255,255,255,0.9);
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            border-radius: 10px;
+            perspective: 1000px;
+            transform-style: preserve-3d;
+        }
+
+        .bb-item {
+            display: none;
+            width: 100%;
+            height: 100%;
+            position: absolute;
+            left: 0;
+            top: 0;
+            z-index: 1;
+            border-radius: 10px;
+            overflow: hidden;
+            transform-style: preserve-3d;
+            backface-visibility: hidden;
+        }
+
+        .bb-item:first-child {
+            display: block;
+        }
+
+        .bb-page {
+            width: 50%;
+            height: 100%;
+            position: absolute;
+            top: 0;
+            overflow: hidden;
+            background-color: #fff;
+            display: block;
+            border: 1px solid #e0e0e0;
+            transform-style: preserve-3d;
+            backface-visibility: hidden;
+        }
+
+        /* Pages gauche et droite */
+        .bb-page-left {
+            left: 0;
+            border-right: 2px solid #ddd;
+            box-shadow: inset -5px 0 10px rgba(0,0,0,0.1);
+            transform-origin: right center;
+        }
+
+        .bb-page-right {
+            right: 0;
+            border-left: 2px solid #ddd;
+            box-shadow: inset 5px 0 10px rgba(0,0,0,0.1);
+            transform-origin: left center;
+        }
+
+        /* RTL Support */
+        [dir="rtl"] .bb-page-left {
+            left: auto;
+            right: 0;
+            border-left: 2px solid #ddd;
+            border-right: none;
+            box-shadow: inset 5px 0 10px rgba(0,0,0,0.1);
+            transform-origin: left center;
+        }
+
+        [dir="rtl"] .bb-page-right {
+            right: auto;
+            left: 0;
+            border-right: 2px solid #ddd;
+            border-left: none;
+            box-shadow: inset -5px 0 10px rgba(0,0,0,0.1);
+            transform-origin: right center;
+        }
+
+        /* Page verso (cachée) */
+        .bb-page-back {
+            opacity: 0.95;
+        }
+
+        /* Effet de flip pour page individuelle */
+        .bb-page.flipping {
+            z-index: 10;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.3);
+        }
+
+        /* Page Content */
+        .page-content {
+            padding: 40px;
+            height: calc(100% - 80px);
+            overflow-y: auto;
+            font-family: var(--font-primary);
+            color: var(--primary-color);
+            box-sizing: border-box;
+        }
+
+        /* Navigation */
+        .bb-nav {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 200;
+            display: flex;
+            gap: 15px;
+        }
+
+        .bb-nav button {
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+
+        .bb-nav button:hover {
+            background: var(--primary-light);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+        }
+
+        .bb-nav button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* Progress Indicator */
+        .progress-container {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: rgba(255,255,255,0.95);
+            padding: 15px 20px;
+            border-radius: 25px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+            z-index: 200;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-family: var(--font-primary);
+        }
+
+        [dir="rtl"] .progress-container {
+            right: auto;
+            left: 20px;
+        }
+
+        .progress-text {
+            font-size: 14px;
+            color: var(--primary-color);
+            font-weight: 500;
+        }
+
+        .progress-bar {
+            width: 100px;
+            height: 4px;
+            background: var(--tertiary-color);
+            border-radius: 2px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: var(--secondary-color);
+            width: 0%;
+            transition: width 0.5s ease;
+        }
+
+        /* Loading */
+        .loading {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+            text-align: center;
+            z-index: 1000;
+        }
+
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid var(--tertiary-color);
+            border-top: 4px solid var(--secondary-color);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 15px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .bb-bookblock {
+                height: 70vh;
+                min-height: 500px;
+                margin: 10px;
+            }
+            
+            .page-content {
+                padding: 20px;
+                font-size: 14px;
+            }
+            
+            .bb-nav {
+                bottom: 15px;
+            }
+            
+            .progress-container {
+                top: 10px;
+                right: 10px;
+                padding: 10px 15px;
+            }
+            
+            [dir="rtl"] .progress-container {
+                left: 10px;
+                right: auto;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Chargement -->
+    <div class="loading" id="loading">
+        <div class="spinner"></div>
+        <div style="color: var(--primary-color); font-weight: 600;">Chargement du livre digital...</div>
+    </div>
+
+    <!-- Indicateur de progression -->
+    <div class="progress-container" id="progressContainer" style="display: none;">
+        <div class="progress-text" id="progressText">Page 1 / {{pages.length}}</div>
+        <div class="progress-bar">
+            <div class="progress-fill" id="progressFill"></div>
+        </div>
+    </div>
+
+    <!-- Conteneur principal BookBlock -->
+    <div class="bb-bookblock" id="bb-bookblock">
+        {{{body}}}
+    </div>
+
+    <!-- Navigation -->
+    <div class="bb-nav" id="bookNav" style="display: none;">
+        <button id="bb-nav-prev" onclick="prevPage()">← <span class="nav-text-prev">Précédent</span></button>
+        <button id="bb-nav-next" onclick="nextPage()"><span class="nav-text-next">Suivant</span> →</button>
+        <button onclick="goToHome()"><span class="nav-text-home">Sommaire</span></button>
+    </div>
+
+    <!-- BookBlock JavaScript -->
+    <script>
+        // BookBlock Plugin (version simplifiée intégrée)
+        (function($) {
+            $.fn.bookblock = function(options) {
+                var settings = $.extend({
+                    speed: 800,
+                    perspective: 1200,
+                    direction: 'ltr',
+                    shadowSides: 0.8,
+                    shadowFlip: 0.7,
+                    circular: false,
+                    onEndFlip: function() {},
+                    onBeforeFlip: function() {}
+                }, options);
+
+                return this.each(function() {
+                    var $this = $(this);
+                    var $items = $this.children('.bb-item');
+                    var current = 0;
+                    var total = $items.length;
+
+                    // Set direction attribute
+                    $this.attr('data-direction', settings.direction);
+
+                    // Initialize
+                    function init() {
+                        $items.each(function(i) {
+                            if (i !== current) {
+                                $(this).hide();
+                            }
+                        });
+                    }
+
+                    // Navigation functions
+                    function next() {
+                        if (current < total - 1) {
+                            flip(current + 1);
+                        }
+                    }
+
+                    function prev() {
+                        if (current > 0) {
+                            flip(current - 1);
+                        }
+                    }
+
+                    function flip(index) {
+                        if (index === current) return;
+
+                        settings.onBeforeFlip();
+
+                        var $currentItem = $items.eq(current);
+                        var $nextItem = $items.eq(index);
+                        var isForward = index > current;
+
+                        // Effet de flip d'une page individuelle
+                        if (isForward) {
+                            // Tourner vers l'avant - simuler qu'une page se lève et se tourne
+                            var $pageToFlip = $currentItem.find('.bb-page-right');
+                            if (settings.direction === 'rtl') {
+                                $pageToFlip = $currentItem.find('.bb-page-left');
+                            }
+                            
+                            // Animer la page qui se tourne
+                            $pageToFlip.css({
+                                'transform-origin': settings.direction === 'rtl' ? 'right center' : 'left center',
+                                'transform': 'rotateY(-180deg)',
+                                'transition': `transform ${settings.speed}ms ease-in-out`,
+                                'z-index': '10'
+                            });
+
+                            setTimeout(function() {
+                                // Afficher la page suivante
+                                $currentItem.hide();
+                                $nextItem.show();
+                                
+                                // Réinitialiser les transformations
+                                $pageToFlip.css({
+                                    'transform': 'none',
+                                    'transition': '',
+                                    'z-index': ''
+                                });
+                                
+                                current = index;
+                                settings.onEndFlip();
+                                updateProgress();
+                            }, settings.speed);
+                        } else {
+                            // Tourner vers l'arrière
+                            var $pageToFlip = $nextItem.find('.bb-page-left');
+                            if (settings.direction === 'rtl') {
+                                $pageToFlip = $nextItem.find('.bb-page-right');
+                            }
+                            
+                            // Préparer la page à tourner
+                            $nextItem.show();
+                            $pageToFlip.css({
+                                'transform': 'rotateY(-180deg)',
+                                'transform-origin': settings.direction === 'rtl' ? 'left center' : 'right center',
+                                'z-index': '10'
+                            });
+                            
+                            setTimeout(function() {
+                                // Animer le retour de la page
+                                $pageToFlip.css({
+                                    'transform': 'rotateY(0deg)',
+                                    'transition': `transform ${settings.speed}ms ease-in-out`
+                                });
+                                
+                                setTimeout(function() {
+                                    $currentItem.hide();
+                                    $pageToFlip.css({
+                                        'transform': 'none',
+                                        'transition': '',
+                                        'z-index': ''
+                                    });
+                                    
+                                    current = index;
+                                    settings.onEndFlip();
+                                    updateProgress();
+                                }, settings.speed);
+                            }, 50);
+                        }
+                    }
+
+                    // Expose methods
+                    $this.data('bookblock', {
+                        next: next,
+                        prev: prev,
+                        jump: flip,
+                        current: function() { return current; },
+                        total: function() { return total; }
+                    });
+
+                    init();
+                });
+            };
+        })(jQuery);
+
+        // Variables globales
+        let bookblock;
+        let totalPages = 0;
+        let currentPage = 0;
+        let isRTL = document.documentElement.dir === 'rtl';
+
+        // Initialisation
+        $(document).ready(function() {
+            setTimeout(() => {
+                $('#loading').fadeOut();
+                $('#progressContainer, #bookNav').fadeIn();
+
+                // Initialiser BookBlock
+                bookblock = $('#bb-bookblock').bookblock({
+                    speed: 800,
+                    direction: isRTL ? 'rtl' : 'ltr',
+                    shadowSides: 0.8,
+                    shadowFlip: 0.7,
+                    onEndFlip: function() {
+                        updateProgress();
+                        updateNavButtons();
+                    }
+                });
+
+                totalPages = bookblock.data('bookblock').total();
+                updateProgress();
+                updateNavButtons();
+
+                // Adapter les textes selon la langue
+                updateNavigationTexts();
+                
+                console.log('📚 BookBlock initialisé avec support RTL:', isRTL);
+            }, 1000);
+        });
+        
+        // Adaptation des textes de navigation
+        function updateNavigationTexts() {
+            if (isRTL) {
+                $('.nav-text-prev').text('التالي');
+                $('.nav-text-next').text('السابق');
+                $('.nav-text-home').text('الفهرس');
+            } else {
+                $('.nav-text-prev').text('Précédent');
+                $('.nav-text-next').text('Suivant');
+                $('.nav-text-home').text('Sommaire');
+            }
+        }
+
+        // Navigation
+        function nextPage() {
+            if (isRTL) {
+                bookblock.data('bookblock').prev();
+            } else {
+                bookblock.data('bookblock').next();
+            }
+        }
+
+        function prevPage() {
+            if (isRTL) {
+                bookblock.data('bookblock').next();
+            } else {
+                bookblock.data('bookblock').prev();
+            }
+        }
+
+        function goToHome() {
+            // Aller au sommaire (page 1) ou couverture (page 0)
+            bookblock.data('bookblock').jump(1);
+        }
+
+        function goToPage(pageIndex) {
+            bookblock.data('bookblock').jump(pageIndex);
+        }
+
+        // Mise à jour progression
+        function updateProgress() {
+            currentPage = bookblock.data('bookblock').current();
+            const progress = (currentPage / (totalPages - 1)) * 100;
+            
+            $('#progressText').text(`Page ${currentPage + 1} / ${totalPages}`);
+            $('#progressFill').css('width', progress + '%');
+        }
+
+        // Mise à jour boutons navigation
+        function updateNavButtons() {
+            const bb = bookblock.data('bookblock');
+            $('#bb-nav-prev').prop('disabled', bb.current() === 0);
+            $('#bb-nav-next').prop('disabled', bb.current() === bb.total() - 1);
+        }
+
+        // Support clavier
+        $(document).keydown(function(e) {
+            switch(e.which) {
+                case 37: // Flèche gauche
+                    if (isRTL) nextPage(); else prevPage();
+                    break;
+                case 39: // Flèche droite
+                    if (isRTL) prevPage(); else nextPage();
+                    break;
+            }
+        });
+    </script>
+</body>
+</html>

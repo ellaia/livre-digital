@@ -1,0 +1,698 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mes Livres - Éditeur de Livre Digital</title>
+    <style>
+        :root {
+            --primary-color: #323e48;
+            --secondary-color: #638c1c;
+            --tertiary-color: #d8e0e5;
+            --primary-light: #4a5660;
+            --secondary-light: #7ba821;
+            --tertiary-dark: #c1cdd4;
+            --font-primary: 'Poppins', Arial, sans-serif;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: var(--font-primary);
+            background: linear-gradient(135deg, var(--tertiary-color) 0%, #e8eff2 100%);
+            min-height: 100vh;
+            padding: 2rem;
+            color: var(--primary-color);
+        }
+
+        .header-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            background: white;
+            padding: 1rem 2rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        }
+
+        .header-bar h1 {
+            color: var(--primary-color);
+            font-size: 1.8rem;
+        }
+
+        .logout-btn {
+            background: #dc3545;
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: background 0.3s ease;
+        }
+
+        .logout-btn:hover {
+            background: #c82333;
+        }
+
+        .main-content {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .actions-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            background: white;
+            padding: 1rem 2rem;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+
+        .create-book-btn {
+            background: var(--secondary-color);
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 500;
+            transition: background 0.3s ease;
+        }
+
+        .create-book-btn:hover {
+            background: var(--secondary-light);
+        }
+
+        .books-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .book-card {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .book-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 30px rgba(0,0,0,0.15);
+        }
+
+        .book-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: var(--primary-color);
+            margin-bottom: 0.5rem;
+        }
+
+        .book-subtitle {
+            color: var(--primary-light);
+            margin-bottom: 1rem;
+            font-size: 0.9rem;
+        }
+
+        .book-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.8rem;
+            color: var(--tertiary-dark);
+            margin-bottom: 1rem;
+        }
+
+        .book-status {
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.7rem;
+            font-weight: 500;
+        }
+
+        .status-published {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .status-draft {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .book-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.3rem;
+        }
+
+        .btn-edit {
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 0.4rem 0.7rem;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            transition: background 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+            text-align: center;
+            flex: 1;
+            min-width: 0;
+        }
+
+        .btn-edit:hover {
+            background: var(--primary-light);
+        }
+
+        .btn-delete {
+            background: #dc3545;
+            color: white;
+            border: none;
+            padding: 0.4rem 0.7rem;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            transition: background 0.3s ease;
+            flex: 1;
+            min-width: 0;
+        }
+
+        .btn-delete:hover {
+            background: #c82333;
+        }
+
+        .btn-duplicate {
+            background: #17a2b8;
+            color: white;
+            border: none;
+            padding: 0.4rem 0.7rem;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            transition: background 0.3s ease;
+            flex: 1;
+            min-width: 0;
+        }
+
+        .btn-duplicate:hover {
+            background: #138496;
+        }
+
+        .btn-visualize {
+            background: #28a745;
+            color: white;
+            border: none;
+            padding: 0.4rem 0.7rem;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            transition: background 0.3s ease;
+            flex: 1;
+            min-width: 0;
+        }
+
+        .btn-visualize:hover {
+            background: #218838;
+        }
+
+        .btn-visualize:disabled {
+            background: #6c757d;
+            cursor: not-allowed;
+        }
+
+        .reference-book {
+            border: 2px solid #17a2b8;
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+        }
+
+        .reference-badge {
+            position: absolute;
+            top: -10px;
+            right: -10px;
+            background: #17a2b8;
+            color: white;
+            padding: 0.25rem 0.5rem;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            font-weight: bold;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+        }
+
+        .modal-content {
+            background-color: white;
+            margin: 10% auto;
+            padding: 2rem;
+            border-radius: 12px;
+            width: 90%;
+            max-width: 500px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+        }
+
+        .modal h2 {
+            margin-bottom: 1rem;
+            color: var(--primary-color);
+        }
+
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: var(--primary-color);
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 0.75rem;
+            border: 2px solid var(--tertiary-dark);
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: var(--secondary-color);
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 1rem;
+            justify-content: flex-end;
+            margin-top: 1.5rem;
+        }
+
+        .btn-cancel {
+            background: var(--tertiary-color);
+            color: var(--primary-color);
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1rem;
+        }
+
+        .btn-save {
+            background: var(--secondary-color);
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1rem;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 2rem;
+            color: var(--primary-light);
+        }
+
+        .no-books {
+            text-align: center;
+            padding: 4rem 2rem;
+            color: var(--primary-light);
+        }
+
+        .no-books h3 {
+            margin-bottom: 1rem;
+            color: var(--primary-color);
+        }
+    </style>
+</head>
+<body>
+    <div class="header-bar">
+        <h1>📚 Mes Livres Digitaux</h1>
+        <button class="logout-btn" onclick="logout()">🚪 Se déconnecter</button>
+    </div>
+
+    <div class="main-content">
+        <div class="actions-bar">
+            <h2>Gérer vos livres</h2>
+            <button class="create-book-btn" onclick="openCreateModal()">➕ Nouveau Livre</button>
+        </div>
+
+        <div id="loading" class="loading">
+            Chargement de vos livres...
+        </div>
+
+        <div id="booksContainer" class="books-grid" style="display: none;">
+            <!-- Les livres seront affichés ici -->
+        </div>
+
+        <div id="noBooksMessage" class="no-books" style="display: none;">
+            <h3>Aucun livre trouvé</h3>
+            <p>Créez votre premier livre digital pour commencer !</p>
+        </div>
+    </div>
+
+    <!-- Modal de création de livre -->
+    <div id="createBookModal" class="modal">
+        <div class="modal-content">
+            <h2>Créer un nouveau livre</h2>
+            <form id="createBookForm">
+                <div class="form-group">
+                    <label for="bookTitle">Titre du livre *</label>
+                    <input type="text" id="bookTitle" name="title" required>
+                </div>
+                <div class="form-group">
+                    <label for="bookSubtitle">Sous-titre</label>
+                    <input type="text" id="bookSubtitle" name="subtitle">
+                </div>
+                <div class="form-group">
+                    <label for="bookSlug">Slug (URL) *</label>
+                    <input type="text" id="bookSlug" name="slug" required pattern="[a-z0-9-]+" title="Lettres minuscules, chiffres et tirets uniquement">
+                    <small>Utilisé pour l'URL (ex: mon-livre-2024)</small>
+                </div>
+                <div class="modal-actions">
+                    <button type="button" class="btn-cancel" onclick="closeCreateModal()">Annuler</button>
+                    <button type="submit" class="btn-save">Créer le livre</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        let books = [];
+        let currentUser = null;
+
+        // Charger les livres au chargement de la page
+        document.addEventListener('DOMContentLoaded', async () => {
+            await loadUserInfo();
+            loadBooks();
+        });
+
+        async function loadUserInfo() {
+            try {
+                const response = await fetch('/api/user');
+                if (response.ok) {
+                    currentUser = await response.json();
+                }
+            } catch (error) {
+                console.error('Erreur lors du chargement des infos utilisateur:', error);
+            }
+        }
+
+        async function loadBooks() {
+            try {
+                const response = await fetch('/books');
+                if (!response.ok) {
+                    throw new Error('Erreur lors du chargement');
+                }
+
+                books = await response.json();
+                displayBooks();
+            } catch (error) {
+                console.error('Erreur:', error);
+                document.getElementById('loading').innerHTML = 'Erreur lors du chargement des livres';
+            }
+        }
+
+        function displayBooks() {
+            const loading = document.getElementById('loading');
+            const container = document.getElementById('booksContainer');
+            const noBooks = document.getElementById('noBooksMessage');
+
+            loading.style.display = 'none';
+
+            if (books.length === 0) {
+                noBooks.style.display = 'block';
+                container.style.display = 'none';
+                return;
+            }
+
+            noBooks.style.display = 'none';
+            container.style.display = 'grid';
+            container.innerHTML = '';
+
+            books.forEach(book => {
+                const bookCard = createBookCard(book);
+                container.appendChild(bookCard);
+            });
+        }
+
+        function createBookCard(book) {
+            const card = document.createElement('div');
+            card.className = book.is_reference ? 'book-card reference-book' : 'book-card';
+            
+            const updatedDate = new Date(book.updated_at).toLocaleDateString('fr-FR');
+            const status = book.is_published ? 'published' : 'draft';
+            const statusText = book.is_published ? 'Publié' : 'Brouillon';
+            
+            // Vérifier si l'utilisateur peut éditer (admin pour les références)
+            const canEdit = !book.is_reference || currentUser?.isAdmin;
+            const isOwner = book.user_id === currentUser?.id;
+
+            let actionsHtml = '';
+            if (book.is_reference) {
+                actionsHtml = `
+                    <button class="btn-visualize" onclick="visualizeBook(${book.id})" title="Générer et visualiser le livre">👁️ Visualiser</button>
+                    <button class="btn-duplicate" onclick="duplicateBook(${book.id})">📋 Dupliquer</button>
+                    ${canEdit ? `<a href="/editor?book=${book.id}" class="btn-edit">✏️ Éditer</a>` : ''}
+                `;
+            } else {
+                actionsHtml = `
+                    <button class="btn-visualize" onclick="visualizeBook(${book.id})" title="Générer et visualiser le livre">👁️ Visualiser</button>
+                    <a href="/editor?book=${book.id}" class="btn-edit">✏️ Éditer</a>
+                    <button class="btn-duplicate" onclick="duplicateBook(${book.id})">📋 Dupliquer</button>
+                    <button class="btn-delete" onclick="deleteBook(${book.id})">🗑️ Supprimer</button>
+                `;
+            }
+
+            card.innerHTML = `
+                ${book.is_reference ? '<div class="reference-badge">📚 Référence</div>' : ''}
+                <div class="book-title">${escapeHtml(book.title)}</div>
+                <div class="book-subtitle">${escapeHtml(book.subtitle || '')}</div>
+                <div class="book-meta">
+                    <span>Mis à jour le ${updatedDate}</span>
+                    <span class="book-status status-${status}">${statusText}</span>
+                </div>
+                <div class="book-actions">
+                    ${actionsHtml}
+                </div>
+            `;
+
+            return card;
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        function openCreateModal() {
+            document.getElementById('createBookModal').style.display = 'block';
+            document.getElementById('bookTitle').focus();
+        }
+
+        function closeCreateModal() {
+            document.getElementById('createBookModal').style.display = 'none';
+            document.getElementById('createBookForm').reset();
+        }
+
+        // Auto-générer le slug à partir du titre
+        document.getElementById('bookTitle').addEventListener('input', function(e) {
+            const title = e.target.value;
+            const slug = title
+                .toLowerCase()
+                .replace(/[^a-z0-9\s-]/g, '')
+                .replace(/\s+/g, '-')
+                .replace(/-+/g, '-')
+                .trim();
+            document.getElementById('bookSlug').value = slug;
+        });
+
+        document.getElementById('createBookForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+
+            const formData = new FormData(e.target);
+            const bookData = {
+                title: formData.get('title'),
+                subtitle: formData.get('subtitle'),
+                slug: formData.get('slug')
+            };
+
+            try {
+                const response = await fetch('/books', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(bookData)
+                });
+
+                if (!response.ok) {
+                    const error = await response.json();
+                    throw new Error(error.error || 'Erreur lors de la création');
+                }
+
+                const result = await response.json();
+                closeCreateModal();
+                
+                // Rediriger vers l'éditeur du nouveau livre
+                window.location.href = `/editor?book=${result.id}`;
+
+            } catch (error) {
+                alert('Erreur: ' + error.message);
+            }
+        });
+
+        async function duplicateBook(bookId) {
+            const title = prompt('Nom du nouveau livre:', '');
+            if (!title) return;
+
+            try {
+                const response = await fetch(`/books/${bookId}/duplicate`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ title })
+                });
+
+                if (!response.ok) {
+                    const error = await response.json();
+                    throw new Error(error.error || 'Erreur lors de la duplication');
+                }
+
+                const result = await response.json();
+                alert('Livre dupliqué avec succès !');
+                
+                // Rediriger vers l'éditeur du nouveau livre
+                window.location.href = `/editor?book=${result.id}`;
+
+            } catch (error) {
+                alert('Erreur: ' + error.message);
+            }
+        }
+
+        async function deleteBook(bookId) {
+            if (!confirm('Êtes-vous sûr de vouloir supprimer ce livre ? Cette action est irréversible.')) {
+                return;
+            }
+
+            try {
+                const response = await fetch(`/books/${bookId}`, {
+                    method: 'DELETE'
+                });
+
+                if (!response.ok) {
+                    throw new Error('Erreur lors de la suppression');
+                }
+
+                // Recharger la liste
+                loadBooks();
+            } catch (error) {
+                alert('Erreur lors de la suppression: ' + error.message);
+            }
+        }
+
+        async function logout() {
+            if (confirm('Êtes-vous sûr de vouloir vous déconnecter ?')) {
+                try {
+                    const response = await fetch('/logout', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        }
+                    });
+
+                    if (response.ok) {
+                        window.location.href = '/login';
+                    } else {
+                        alert('Erreur lors de la déconnexion');
+                    }
+                } catch (error) {
+                    console.error('Erreur:', error);
+                    alert('Erreur lors de la déconnexion');
+                }
+            }
+        }
+
+        async function visualizeBook(bookId) {
+            const button = event.target;
+            const originalText = button.textContent;
+            
+            try {
+                // Désactiver le bouton et afficher l'état de chargement
+                button.disabled = true;
+                button.textContent = '⏳ Vérification...';
+                
+                // Essayer d'abord d'ouvrir directement la visualisation
+                const previewUrl = `/books/${bookId}/preview?type=rtl`;
+                const previewResponse = await fetch(previewUrl, { method: 'HEAD' });
+                
+                if (previewResponse.ok) {
+                    // Le livre est déjà généré, l'ouvrir directement
+                    window.open(previewUrl, '_blank');
+                } else {
+                    // Le livre n'est pas généré, le générer d'abord
+                    button.textContent = '⏳ Génération...';
+                    
+                    const buildResponse = await fetch(`/build?book=${bookId}`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({ generatorType: 'rtl' })
+                    });
+                    
+                    if (!buildResponse.ok) {
+                        throw new Error('Erreur lors de la génération du livre');
+                    }
+                    
+                    // Attendre que la génération se termine
+                    await new Promise(resolve => setTimeout(resolve, 2000));
+                    
+                    // Ouvrir la prévisualisation
+                    window.open(previewUrl, '_blank');
+                }
+                
+            } catch (error) {
+                console.error('Erreur:', error);
+                alert('Erreur lors de la visualisation: ' + error.message);
+            } finally {
+                // Réactiver le bouton
+                button.disabled = false;
+                button.textContent = originalText;
+            }
+        }
+
+        // Fermer le modal en cliquant en dehors
+        window.onclick = function(event) {
+            const modal = document.getElementById('createBookModal');
+            if (event.target === modal) {
+                closeCreateModal();
+            }
+        }
+    </script>
+</body>
+</html>

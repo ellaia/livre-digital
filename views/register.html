@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inscription - Éditeur de Livre Digital</title>
+    <style>
+        :root {
+            --primary-color: #323e48;
+            --secondary-color: #638c1c;
+            --tertiary-color: #d8e0e5;
+            --primary-light: #4a5660;
+            --secondary-light: #7ba821;
+            --tertiary-dark: #c1cdd4;
+            --font-primary: 'Poppins', Arial, sans-serif;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: var(--font-primary);
+            background: linear-gradient(135deg, var(--tertiary-color) 0%, #e8eff2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--primary-color);
+        }
+
+        .register-container {
+            background: white;
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            width: 100%;
+            max-width: 400px;
+        }
+
+        .register-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .register-header h1 {
+            color: var(--primary-color);
+            margin-bottom: 0.5rem;
+            font-size: 1.8rem;
+        }
+
+        .register-header p {
+            color: var(--primary-light);
+            font-size: 0.9rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: var(--primary-color);
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 0.75rem;
+            border: 2px solid var(--tertiary-dark);
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: var(--secondary-color);
+        }
+
+        .form-group .input-help {
+            font-size: 0.8rem;
+            color: var(--primary-light);
+            margin-top: 0.25rem;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 0.75rem;
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .btn:hover {
+            background: var(--primary-light);
+        }
+
+        .btn:disabled {
+            background: var(--tertiary-color);
+            cursor: not-allowed;
+        }
+
+        .alert {
+            padding: 0.75rem;
+            border-radius: 6px;
+            margin-bottom: 1rem;
+            font-size: 0.9rem;
+        }
+
+        .alert-error {
+            background: #fee;
+            color: #c53030;
+            border: 1px solid #fed7d7;
+        }
+
+        .alert-success {
+            background: #f0fff4;
+            color: #22543d;
+            border: 1px solid #c6f6d5;
+        }
+
+        .login-link {
+            text-align: center;
+            margin-top: 1.5rem;
+            padding-top: 1rem;
+            border-top: 1px solid var(--tertiary-color);
+        }
+
+        .login-link a {
+            color: var(--secondary-color);
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .login-link a:hover {
+            text-decoration: underline;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            color: var(--primary-light);
+        }
+
+        .password-strength {
+            margin-top: 0.5rem;
+            font-size: 0.8rem;
+        }
+
+        .strength-weak { color: #e53e3e; }
+        .strength-medium { color: #dd6b20; }
+        .strength-strong { color: #38a169; }
+    </style>
+</head>
+<body>
+    <div class="register-container">
+        <div class="register-header">
+            <h1>📝 Inscription</h1>
+            <p>Créez votre compte pour accéder à l'éditeur</p>
+        </div>
+
+        <div id="message"></div>
+
+        <form id="registerForm">
+            <div class="form-group">
+                <label for="username">Nom d'utilisateur</label>
+                <input type="text" id="username" name="username" required minlength="3" maxlength="50">
+                <div class="input-help">3-50 caractères, lettres et chiffres uniquement</div>
+            </div>
+
+            <div class="form-group">
+                <label for="email">Email</label>
+                <input type="email" id="email" name="email" required>
+            </div>
+
+            <div class="form-group">
+                <label for="password">Mot de passe</label>
+                <input type="password" id="password" name="password" required minlength="6">
+                <div class="input-help">Minimum 6 caractères</div>
+                <div id="passwordStrength" class="password-strength"></div>
+            </div>
+
+            <div class="form-group">
+                <label for="confirmPassword">Confirmer le mot de passe</label>
+                <input type="password" id="confirmPassword" name="confirmPassword" required>
+            </div>
+
+            <button type="submit" class="btn" id="registerBtn">
+                S'inscrire
+            </button>
+
+            <div class="loading" id="loading">
+                Création du compte...
+            </div>
+        </form>
+
+        <div class="login-link">
+            <p>Déjà un compte ? <a href="/login">Se connecter</a></p>
+        </div>
+    </div>
+
+    <script>
+        const registerForm = document.getElementById('registerForm');
+        const registerBtn = document.getElementById('registerBtn');
+        const loading = document.getElementById('loading');
+        const messageDiv = document.getElementById('message');
+        const passwordInput = document.getElementById('password');
+        const confirmPasswordInput = document.getElementById('confirmPassword');
+        const passwordStrengthDiv = document.getElementById('passwordStrength');
+
+        function showMessage(message, type = 'error') {
+            messageDiv.innerHTML = `<div class="alert alert-${type}">${message}</div>`;
+        }
+
+        function clearMessage() {
+            messageDiv.innerHTML = '';
+        }
+
+        function checkPasswordStrength(password) {
+            if (password.length < 6) {
+                return { strength: 'weak', text: 'Trop court' };
+            }
+            
+            let score = 0;
+            if (password.length >= 8) score++;
+            if (/[a-z]/.test(password)) score++;
+            if (/[A-Z]/.test(password)) score++;
+            if (/[0-9]/.test(password)) score++;
+            if (/[^a-zA-Z0-9]/.test(password)) score++;
+
+            if (score < 2) return { strength: 'weak', text: 'Faible' };
+            if (score < 4) return { strength: 'medium', text: 'Moyen' };
+            return { strength: 'strong', text: 'Fort' };
+        }
+
+        passwordInput.addEventListener('input', (e) => {
+            const password = e.target.value;
+            if (password) {
+                const { strength, text } = checkPasswordStrength(password);
+                passwordStrengthDiv.innerHTML = `<span class="strength-${strength}">Force: ${text}</span>`;
+            } else {
+                passwordStrengthDiv.innerHTML = '';
+            }
+        });
+
+        registerForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const username = document.getElementById('username').value.trim();
+            const email = document.getElementById('email').value.trim();
+            const password = document.getElementById('password').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+
+            // Validations côté client
+            if (!username || !email || !password || !confirmPassword) {
+                showMessage('Veuillez remplir tous les champs');
+                return;
+            }
+
+            if (username.length < 3 || username.length > 50) {
+                showMessage('Le nom d\'utilisateur doit contenir entre 3 et 50 caractères');
+                return;
+            }
+
+            if (!/^[a-zA-Z0-9_]+$/.test(username)) {
+                showMessage('Le nom d\'utilisateur ne peut contenir que des lettres, chiffres et underscores');
+                return;
+            }
+
+            if (password.length < 6) {
+                showMessage('Le mot de passe doit contenir au moins 6 caractères');
+                return;
+            }
+
+            if (password !== confirmPassword) {
+                showMessage('Les mots de passe ne correspondent pas');
+                return;
+            }
+
+            // Afficher le loading
+            registerBtn.style.display = 'none';
+            loading.style.display = 'block';
+            clearMessage();
+
+            try {
+                const response = await fetch('/register', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ username, email, password })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    showMessage('Compte créé avec succès ! Redirection vers la connexion...', 'success');
+                    setTimeout(() => {
+                        window.location.href = '/login';
+                    }, 2000);
+                } else {
+                    showMessage(data.error || 'Erreur lors de la création du compte');
+                }
+            } catch (error) {
+                showMessage('Erreur de connexion au serveur');
+            } finally {
+                // Cacher le loading
+                registerBtn.style.display = 'block';
+                loading.style.display = 'none';
+            }
+        });
+
+        // Auto-focus sur le premier champ
+        document.getElementById('username').focus();
+    </script>
+</body>
+</html>
